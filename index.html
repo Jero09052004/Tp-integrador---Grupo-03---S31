@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digitalización de Imágenes - TP Integrador</title>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #122B50;
+      --panel-bg: #171E31;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --border-color: #334155;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-placeholder {
+      background-color: #fff;
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .header h1 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .header h1 span {
+      color: var(--accent-blue);
+    }
+
+    .header h2 {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 5px 0 0 0;
+    }
+
+    .upload-section {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      background-color: rgba(30, 41, 59, 0.5);
+      transition: background-color 0.3s;
+    }
+
+    .upload-section:hover {
+      background-color: var(--panel-bg);
+    }
+
+    .upload-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .upload-content p span {
+      color: var(--accent-blue);
+    }
+
+    .panel {
+      background-color: var(--panel-bg);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 2.5fr;
+      gap: 20px;
+    }
+
+    .res-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .res-btn {
+      background-color: #153E42;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .res-btn:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .res-btn.active {
+      background-color: rgba(59, 130, 246, 0.2);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    .compress-btn {
+      width: 100%;
+      background-color: #4b5563;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .compress-btn:hover {
+      background-color: #6b7280;
+    }
+
+    .images-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      height: calc(100% - 40px);
+    }
+
+    .image-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .image-box p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .placeholder {
+      flex-grow: 1;
+      background-color: #0f172a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--border-color);
+      border: 1px solid var(--border-color);
+      min-height: 250px;
+    }
+
+    .image-box img {
+      width: 100%;
+      height: 250px;
+      object-fit: contain;
+      background-color: #000;
+      border-radius: 8px;
+    }
+
+    .stats-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .stat-box {
+      background-color: #0f172a;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-blue);
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .stat-box small {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .stat-box p {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent-blue);
+    }
+
+    .download-btn {
+      background-color: var(--accent-green);
+      color: #000;
+      padding: 10px 25px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      transition: opacity 0.2s;
+    }
+
+    .download-btn:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef } = React;
+
+    function App() {
+      const [originalImage, setOriginalImage] = useState(null);
+      const [originalSize, setOriginalSize] = useState(0);
+      const [compressedImage, setCompressedImage] = useState(null);
+      const [compressedSize, setCompressedSize] = useState(0);
+      
+      const [selectedResolution, setSelectedResolution] = useState(null);
+      const fileInputRef = useRef(null);
+
+      const resolutions = [
+        { width: 800, height: 800, label: '800 x 800 px' },
+        { width: 1024, height: 1024, label: '1024 x 1024 px' },
+        { width: 400, height: 400, label: '400 x 400 px' },
+        { width: 1920, height: 1080, label: '1920 x 1080 px' },
+      ];
+
+      const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          setOriginalSize(file.size);
+          const imageUrl = URL.createObjectURL(file);
+          setOriginalImage(imageUrl);
+          setCompressedImage(null);
+          setCompressedSize(0);
+        }
+      };
+
+      const handleCompress = () => {
+        if (!originalImage || !selectedResolution) {
+          alert("Por favor, subí una imagen y seleccioná una resolución.");
+          return;
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+
+        img.onload = () => {
+          canvas.width = selectedResolution.width;
+          canvas.height = selectedResolution.height;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          const base64str = dataUrl.split(',')[1];
+          const decodedLength = atob(base64str).length;
+
+          setCompressedImage(dataUrl);
+          setCompressedSize(decodedLength);
+        };
+
+        img.src = originalImage;
+      };
+
+      const formatMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+      const reductionPercent = originalSize && compressedSize 
+        ? (100 - (compressedSize * 100) / originalSize).toFixed(2) 
+        : 0;
+
+      return (
+        <div className="app-container">
+          <header className="header">
+            <div className="logo-placeholder">UTN</div>
+            <div>
+              <h1>DIGITALIZACIÓN Y CONVERSIÓN <span>DE IMÁGENES</span></h1>
+              <h2>Comunicación de Datos S31 - Grupo 03</h2>
+            </div>
+          </header>
+
+          <section className="upload-section" onClick={() => fileInputRef.current.click()}>
+            <input 
+              type="file" 
+              accept="image/png, image/jpeg, image/webp" 
+              ref={fileInputRef} 
+              style={{ display: 'none' }} 
+              onChange={handleImageUpload} 
+            />
+            <div className="upload-content">
+              <span className="upload-icon">☁️</span>
+              <p><strong>Arrastrá o hace CLICK para</strong> <span>cargar una imagen</span></p>
+              <small>PNG, JPG, WEBP - Todo formato es válido</small>
+            </div>
+          </section>
+
+          <div className="main-grid">
+            <aside className="config-panel panel">
+              <h3>⚙ CONFIGURACION</h3>
+              <div className="resolutions">
+                <p>RESOLUCION</p>
+                <div className="res-grid">
+                  {resolutions.map((res, index) => (
+                    <button 
+                      key={index}
+                      className={`res-btn ${selectedResolution === res ? 'active' : ''}`}
+                      onClick={() => setSelectedResolution(res)}
+                    >
+                      {res.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button className="compress-btn" onClick={handleCompress}>
+                ➔ Comprimir Imagen
+              </button>
+            </aside>
+
+            <section className="comparison-panel panel">
+              <h3>🖼 COMPARACION</h3>
+              <div className="images-container">
+                <div className="image-box">
+                  <p>ORIGINAL</p>
+                  {originalImage ? (
+                    <img src={originalImage} alt="Original" />
+                  ) : (
+                    <div className="placeholder">Sin imagen</div>
+                  )}
+                </div>
+                <div className="image-box">
+                  <p>DIGITALIZADA</p>
+                  {compressedImage ? (
+                    <img src={compressedImage} alt="Comprimida" />
+                  ) : (
+                    <div className="placeholder">Cargá una imagen primero</div>
+                  )}
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <footer className="stats-panel panel">
+            <h3>📊 Observaciones Realizadas</h3>
+            <div className="stats-grid">
+              <div className="stat-box">
+                <small>TAMAÑO ORIGINAL</small>
+                <p>{originalSize ? formatMB(originalSize) : '0.00'} MB</p>
+              </div>
+              <div className="stat-box">
+                <small>TAMAÑO COMPRIMIDO</small>
+                <p>{compressedSize ? formatMB(compressedSize) : '0.00'} MB</p>
+              </div>
+              <div className="stat-box">
+                <small>REDUCCIÓN (%)</small>
+                <p>{reductionPercent} %</p>
+              </div>
+              <div className="stat-box">
+                <small>RESOLUCIÓN SALIDA</small>
+                <p>{selectedResolution && compressedImage ? selectedResolution.label : '# x # PX'}</p>
+              </div>
+              <div className="download-container">
+                {compressedImage && (
+                  <a href={compressedImage} download="imagen_digitalizada.jpg" className="download-btn">
+                    📥 Descargar
+                  </a>
+                )}
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    // Renderizamos la aplicación
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
