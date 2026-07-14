@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digitalización de Imágenes - TP Integrador</title>
-
+ñ
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   
@@ -74,6 +74,12 @@
       cursor: pointer;
       background-color: rgba(30, 41, 59, 0.5);
       transition: background-color 0.3s;
+    }
+
+    .upload-section.dragging {
+      border-color: var(--accent-blue);
+      background-color: var(--panel-bg);
+      transform: scale(1.02);
     }
 
     .upload-section:hover {
@@ -252,6 +258,7 @@
       
       const [selectedResolution, setSelectedResolution] = useState(null);
       const fileInputRef = useRef(null);
+      const [dragging, setDragging] = useState(false);
 
       const resolutions = [
         { width: 800, height: 800, label: '800 x 800 px' },
@@ -260,15 +267,41 @@
         { width: 1920, height: 1080, label: '1920 x 1080 px' },
       ];
 
-      const handleImageUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-          setOriginalSize(file.size);
-          const imageUrl = URL.createObjectURL(file);
-          setOriginalImage(imageUrl);
-          setCompressedImage(null);
-          setCompressedSize(0);
+      const loadImage = (file) => {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          alert('El archivo no es una imagen.');
+          return;
         }
+        setOriginalSize(file.size);
+        const imageUrl = URL.createObjectURL(file);
+        setOriginalImage(imageUrl);
+        setCompressedImage(null);
+        setCompressedSize(0);
+      };
+
+      const handleImageUpload = (event) => {
+        loadImage(event.target.files[0]);
+      };
+
+      const handleDragOver = (event) => {
+        event.preventDefault();
+      };
+
+      const handleDragEnter = (event) => {
+        event.preventDefault();
+        setDragging(true);
+      };
+
+      const handleDragLeave = (event) => {
+        event.preventDefault();
+        setDragging(false);
+      };
+
+      const handleDrop = (event) => {
+        event.preventDefault();
+        setDragging(false);
+        loadImage(event.dataTransfer.files[0]);
       };
 
       const handleCompress = () => {
@@ -312,7 +345,14 @@
             </div>
           </header>
 
-          <section className="upload-section" onClick={() => fileInputRef.current.click()}>
+          <section
+            className={`upload-section ${dragging ? "dragging" : ""}`}
+            onClick={() => fileInputRef.current.click()}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
             <input 
               type="file" 
               accept="image/png, image/jpeg, image/webp" 
