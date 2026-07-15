@@ -89,7 +89,7 @@ El estado de React se actualiza reactivamente, recalculando las observaciones ma
 
 - **Tasa de reducción:** Se calcula mediante la fórmula:
 
-$$\text{Reducción (\%)} = \left( 1 - \frac{\text{Tamaño Comprimido}}{\text{Tamaño Original}} \right) \times 100$$
+$$\text{Reducción} = \left( 1 - \frac{\text{Tamaño Comprimido}}{\text{Tamaño Original}} \right) \times 100$$
 - **Formatos:** Transforma los bytes puros a formato legible en Megabytes (MB) dividiendo de manera sucesiva por $1024$.
 
 ## Tecnologías utilizadas
